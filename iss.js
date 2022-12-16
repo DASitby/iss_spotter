@@ -13,10 +13,9 @@ const fetchMyIP = (cb) => {
     return cb(null,ip);
   });
 };
-const IP = fetchMyIP((error,ip) => ip);
 
-const fetchCoordsByIP = (cb) => {
-  request(`https://ipwho.is/`, (error, response, body) => {
+const fetchCoordsByIP = (ip, cb) => {
+  request(`https://ipwho.is/${ip}`, (error, response, body) => {
     if (error) {
       return cb(error, null);
     }
@@ -31,4 +30,4 @@ const fetchCoordsByIP = (cb) => {
   });
 };
 
-module.exports = {fetchMyIP, fetchCoordsByIP};
+module.exports = {fetchMyIP, fetchCoordsByIP,};
