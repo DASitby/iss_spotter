@@ -15,9 +15,10 @@ const fetchMyIP = (cb) => {
 };
 
 const fetchCoordsByIP = (ip, cb) => {
-  request(`https://ipwho.is/${ip}`, (error, response, body) => {
+  request(`http://ipwho.is/${ip}`, (error, response, body) => {
     if (error) {
-      return cb(error, null);
+      cb(error, null);
+      return;
     }
     const parsedBody = JSON.parse(body);
     if (!parsedBody.success) {
@@ -25,9 +26,22 @@ const fetchCoordsByIP = (ip, cb) => {
       cb(Error(message), null);
       return;
     }
-    const coords = {latitude: parsedBody.latitude, longitude: parsedBody.longitude};
-    cb(null, coords);
+    const { latitude, longitude } = parsedBody;
+    cb(null, { latitude, longitude });
   });
 };
 
-module.exports = {fetchMyIP, fetchCoordsByIP,};
+const fetchISSFlyOverTimes = (coords,cb) => {
+  request(`https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`, (error, response, body) => {
+    if (error) {
+      return cb(error, null);
+    }
+    const parsedBody = JSON.parse(body);
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
+      return cb(Error(msg), null);
+    }
+    return cb(null,parsedBody.response);
+  });
+};
+module.exports = {fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes};
